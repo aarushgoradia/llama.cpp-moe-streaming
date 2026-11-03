@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="150" viewBox="0 0 840 150" role="img"><title>thesis: moe experts streamed from nvme through dram into the gpu</title><style>
+svg{font-size:13px} text{font-family:SFMono-Regular, ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace;fill:#1f2328}
+.t{fill:#1f2328} .m{fill:#59636e} .f{fill:#8c959f} .a{fill:#8250df} .h{fill:#cf222e}
+.box{fill:#f6f8fa;stroke:#d0d7de;stroke-width:1}
+.abox{fill:#f4efff;stroke:#c8b5f5;stroke-width:1}
+.hbox{fill:#ffebe9;stroke:#cf222e;stroke-width:1}
+.obox{fill:none;stroke:#d0d7de;stroke-width:1}
+.dash{fill:none;stroke:#d0d7de;stroke-width:1;stroke-dasharray:4 4}
+.ln{fill:none;stroke:#59636e;stroke-width:1.5}
+.al{fill:none;stroke:#8250df;stroke-width:1.75}
+.hl{fill:none;stroke:#cf222e;stroke-width:1.75}
+.fl{fill:none;stroke:#8c959f;stroke-width:1}
+.gl{fill:none;stroke:#eaeef2;stroke-width:1}
+.dashed{stroke-dasharray:5 4}
+.mk{fill:#59636e} .mka{fill:#8250df} .mkh{fill:#cf222e}
+.fill-a{fill:#8250df} .fill-m{fill:#59636e} .fill-f{fill:#8c959f} .fill-fg{fill:#1f2328}
+.fill-line{fill:#d0d7de} .fill-panel{fill:#f6f8fa}
+.s1{fill:#2a78d6} .s2{fill:#eb6834} .s3{fill:#1baf7a} .s4{fill:#eda100}
+.q1{fill:#d8cbfb} .q2{fill:#ae92f2} .q3{fill:#8250df}
+.edge{fill:none;stroke:#8c959f;stroke-width:1;stroke-opacity:.45}
+.ring{stroke:#f6f8fa;stroke-width:2}
+</style><defs>
+<marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" class="mk"/></marker>
+<marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" class="mka"/></marker>
+<marker id="arh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L10,5 L0,9 z" class="mkh"/></marker>
+</defs><rect x="20.0" y="20.0" width="180.0" height="62.0" rx="6" class="box"/><text x="110.0" y="48.0" class="t" text-anchor="middle" font-size="13" font-weight="600">nvme nand</text><text x="110.0" y="64.0" class="m" text-anchor="middle" font-size="11.5">whole model lives here</text><rect x="330.0" y="20.0" width="180.0" height="62.0" rx="6" class="box"/><text x="420.0" y="48.0" class="t" text-anchor="middle" font-size="13" font-weight="600">dram</text><text x="420.0" y="64.0" class="m" text-anchor="middle" font-size="11.5">staging + expert cache</text><rect x="640.0" y="20.0" width="180.0" height="62.0" rx="6" class="abox"/><text x="730.0" y="48.0" class="a" text-anchor="middle" font-size="13" font-weight="600">gpu</text><text x="730.0" y="64.0" class="m" text-anchor="middle" font-size="11.5">active experts only</text><path d="M200.0,51.0 L328.0,51.0" class="al" marker-end="url(#ara)"/><text x="265.0" y="43.0" class="m" text-anchor="middle" font-size="11.5">pcie</text><path d="M510.0,51.0 L638.0,51.0" class="al" marker-end="url(#ara)"/><text x="575.0" y="43.0" class="m" text-anchor="middle" font-size="11.5">pcie</text><text x="420.0" y="120.0" class="m" text-anchor="middle" font-size="12">per node, layers split across 3–4 nodes · expert cache · prefetch · compute/io overlap</text></svg>
