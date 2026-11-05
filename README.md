@@ -1,61 +1,61 @@
 # llama.cpp-moe-streaming
 
-my senior thesis at princeton, advised by david wentzlaff: run trillion-parameter mixture-of-experts models on a few ordinary pcs. the whole model stays on nvme flash, and each token pulls in only the experts it actually uses. built on [llama.cpp](https://github.com/ggml-org/llama.cpp).
+My senior thesis at Princeton, advised by David Wentzlaff: running trillion-parameter mixture-of-experts (MoE) models on a few ordinary PCs. The whole model stays on NVMe flash, and each token pulls in only the experts it actually uses. Built on [llama.cpp](https://github.com/ggml-org/llama.cpp).
 
-**status: setting up.** nothing in this fork differs from upstream yet. this page is the plan, and results will show up here as they come in.
+**Status: setting up.** Nothing in this fork differs from upstream yet. This page describes the plan, and results will be added as they come in.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/thesis/overview-dark.svg">
-  <img alt="nvme nand to dram to gpu over pcie on each node, with layers split across 3 to 4 nodes, an expert cache, prefetch and compute/io overlap" src="docs/thesis/overview-light.svg">
+  <img alt="NVMe NAND to DRAM to GPU over PCIe on each node, with layers split across 3 to 4 nodes, an expert cache, prefetch and compute/IO overlap" src="docs/thesis/overview-light.svg">
 </picture>
 
-## the problem
+## The problem
 
-a trillion parameters at 4 bits is about 500 gb of weights. one of these nodes has 12 gb of vram and 32 gb of ram, so nearly all of the model has to live on flash. an moe only routes each token through a few experts, so decode doesn't need every weight, just the active experts that aren't already sitting in ram or vram. that makes decode a flash-bandwidth problem:
+A trillion parameters at 4 bits is about 500 GB of weights. Each of these nodes has 12 GB of VRAM and 32 GB of RAM, so nearly all of the model has to live on flash. An MoE routes each token through only a few experts, so decode doesn't need every weight, just the active experts that aren't already in RAM or VRAM. That makes decode a flash-bandwidth problem:
 
 ```math
 \text{tokens/s} \;\lesssim\; \frac{B_{\text{flash}}}{(1 - h)\, S_{\text{active}}}
 ```
 
 - $S_{\text{active}}$: bytes of expert weights one token touches
-- $h$: the fraction of those already cached in ram or vram
-- $B_{\text{flash}}$: how fast a node can read from its nvme drives
+- $h$: the fraction of those already cached in RAM or VRAM
+- $B_{\text{flash}}$: how fast a node can read from its NVMe drives
 
-my bandwidth model puts sequential decode at around **1.5 tok/s** on this hardware. the goal is to get past **10**.
+My bandwidth model puts sequential decode at around **1.5 tok/s** on this hardware. The goal is to get past **10**.
 
-## what this fork will change
+## What this fork will change
 
-each change goes after one term of that bound.
+Each change targets one term of that bound.
 
-| change | what it moves |
+| Change | What it moves |
 | --- | --- |
-| an expert cache across ram and vram that keeps hot experts resident | raises $h$ |
-| prefetching experts for upcoming layers | hides flash latency |
-| overlapping compute with io | the gpu stops waiting on reads |
-| reading three gen5 nvme drives per node in parallel | raises $B_{\text{flash}}$ |
-| splitting layers across nodes (pipeline parallel) | each node stores and streams only its slice |
+| An expert cache across RAM and VRAM that keeps hot experts resident | Raises $h$ |
+| Prefetching experts for upcoming layers | Hides flash latency |
+| Overlapping compute with IO | The GPU stops waiting on reads |
+| Reading three Gen5 NVMe drives per node in parallel | Raises $B_{\text{flash}}$ |
+| Splitting layers across nodes (pipeline parallelism) | Each node stores and streams only its slice |
 
-## hardware (planned, 3–4 nodes)
+## Hardware (planned, 3–4 nodes)
 
-| per node | |
+| Per node | |
 | --- | --- |
-| cpu | ryzen 5 7600x (zen 4, avx-512) |
-| gpu | rtx 5070 12 gb, pcie x16 |
-| ram | 32 gb ddr5-6000 |
-| flash | 3 × 1 tb pcie gen5 nvme |
+| CPU | Ryzen 5 7600X (Zen 4, AVX-512) |
+| GPU | RTX 5070 12 GB, PCIe x16 |
+| RAM | 32 GB DDR5-6000 |
+| Flash | 3 × 1 TB PCIe Gen5 NVMe |
 
-the small amount of ram is on purpose. the model can't hide in dram, so the results measure the flash tier, not memory capacity. the 5070 won out over the 16 gb 5060 ti because it gets a full x16 link, which matters when every expert crosses pcie.
+The small amount of RAM is deliberate. The model can't hide in DRAM, so the results measure the flash tier, not memory capacity. The 5070 won out over the 16 GB 5060 Ti because it gets a full x16 link, which matters when every expert crosses PCIe.
 
-## how it'll be measured
+## Evaluation
 
-- **baseline:** stock llama.cpp on the same nodes with the same model. that isolates what these changes buy.
-- **comparison:** [strata](https://github.com/Niko1221/Strata), a hybrid vram / ram / ssd moe engine. its test machine is almost identical to one of these nodes.
-- **metric:** sequential decode tok/s, with each change turned on one at a time.
+- **Baseline:** stock llama.cpp on the same nodes with the same model, which isolates what these changes contribute.
+- **Comparison:** [Strata](https://github.com/Niko1221/Strata), a hybrid VRAM / RAM / SSD MoE engine. Its test machine is almost identical to one of these nodes.
+- **Metric:** sequential decode tok/s, with each change enabled one at a time.
 
-## results
+## Results
 
-none yet.
+None yet.
 
-## the code
+## The code
 
-once there's something to show, [this compare view](https://github.com/ggml-org/llama.cpp/compare/master...aarushgoradia:llama.cpp-moe-streaming:thesis) shows only what this fork changes. everything else is stock llama.cpp. see the [upstream readme](https://github.com/ggml-org/llama.cpp#readme) for building and running it.
+Once there's something to show, [this compare view](https://github.com/ggml-org/llama.cpp/compare/master...aarushgoradia:llama.cpp-moe-streaming:thesis) shows only what this fork changes. Everything else is stock llama.cpp. See the [upstream README](https://github.com/ggml-org/llama.cpp#readme) for building and running it.
